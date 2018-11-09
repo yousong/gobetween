@@ -82,7 +82,12 @@ deps: clean-deps
 clean-dist:
 	rm -rf ./dist/${VERSION}
 
-#
+rpm: build
+	set -x; topdir=$$(mktemp -d -t gobetween-XXXXXXX 2>/dev/null) && \
+		  rpmbuild --define "_topdir $${topdir}" --define "gobetween_bin $(CURDIR)/bin/gobetween" -bb $(CURDIR)/build/gobetween.spec && \
+		  cp -rf $$topdir/RPMS/* $(CURDIR)/bin/ && \
+		  rm -rf $$topdir
+
 dist:
 	@# For linux 386 when building on linux amd64 you'll need 'libc6-dev-i386' package
 	@echo Building dist
