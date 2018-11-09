@@ -193,6 +193,13 @@ func (this *Server) serve() {
 			buf := make([]byte, UDP_PACKET_SIZE)
 			n, clientAddr, err := this.serverConn.ReadFromUDP(buf)
 
+			if this.access != nil {
+				if !this.access.Allows(&clientAddr.IP) {
+					log.Debug("Client disallowed to connect ", this.serverConn.RemoteAddr())
+					continue
+				}
+			}
+
 			if err != nil {
 				if atomic.LoadUint32(&this.stopped) == 1 {
 					return
