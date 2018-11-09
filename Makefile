@@ -56,26 +56,15 @@ clean-deps:
 	rm -rf ./vendor/pkg
 	rm -rf ./vendor/bin
 
-deps: clean-deps
-	go get -v github.com/burntsushi/toml
-	go get -v github.com/miekg/dns
-	go get -v github.com/fsouza/go-dockerclient
-	go get -v github.com/sirupsen/logrus
-	go get -v github.com/elgs/gojq
-	go get -v github.com/gin-gonic/gin
-	go get -v github.com/hashicorp/consul/api
-	go get -v github.com/spf13/cobra
-	go get -v github.com/Microsoft/go-winio
-	go get -v github.com/Azure/go-ansiterm
-	go get -v golang.org/x/sys/windows
-	go get -v github.com/inconshreveable/mousetrap
-	go get -v github.com/gin-contrib/cors
-	go get -v github.com/lxc/lxd/client
-	go get -v github.com/lxc/lxd/lxc/config
-	go get -v github.com/lxc/lxd/shared
-	go get -v github.com/lxc/lxd/shared/api
-	go get -v github.com/pires/go-proxyproto
-	go get -v golang.org/x/crypto/acme/autocert
+deps:
+	set -e; \
+	go list -f '{{ join .Imports "\n"}}' ./src/... \
+		| grep -v '^_' \
+		| sort -u \
+		| while read p; do \
+			echo go get -v "$$p"; \
+			go get -v "$$p"; \
+		done
 	GOOS=windows GOARCH=386 CGO=0   go get -v github.com/konsorten/go-windows-terminal-sequences
 	GOOS=windows GOARCH=amd64 CGO=0 go get -v github.com/konsorten/go-windows-terminal-sequences
 
